@@ -1,28 +1,55 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div v-if="info">
+      <Catalog 
+        :nodes="info.data.contents"
+        :depth="0"   
+        :label="info.data.name"
+        :type="info.data.type"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from "axios";
+import Catalog from './components/Catalog.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Catalog
+  },
+  data: () => ({
+      isShow: false,
+      info: null
+    }),
+  mounted() {
+    axios
+      .get('./static/node_modules.json')
+      .then(response => (this.info = response));
   }
 }
 </script>
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  padding-top: 20px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1em;
+  padding-right: calc(20px - (100vw - 100%));
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin: 0 auto;
+  max-width: 1200px;
 }
 </style>
