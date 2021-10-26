@@ -1,11 +1,16 @@
 <template>
   <div id="app">
-    <div v-if="info">
+    <div class="path-wrapper">
+      <h2>{{currentPath}}</h2>
+    </div>
+    <div v-if="info" class="main">
       <Catalog 
         :nodes="info.data.contents"
-        :depth="0"   
+        :depth="0"
+        :path="'node_modules/'"   
         :label="info.data.name"
         :type="info.data.type"
+        @childClick="changePath"
       />
     </div>
   </div>
@@ -21,9 +26,15 @@ export default {
     Catalog
   },
   data: () => ({
+      currentPath: "",
       isShow: false,
       info: null
     }),
+  methods: {
+    changePath(p) {
+       this.currentPath = p.slice(0, -1);
+    }
+  },
   mounted() {
     axios
       .get('./static/node_modules.json')
@@ -49,7 +60,20 @@ body {
 }
 
 #app {
-  margin: 0 auto;
+  margin: 60px auto;
   max-width: 1200px;
+}
+
+.path-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  min-height: 50px;
+  width: 100%;
+  border: 2px solid black;
+}
+
+.main {
+  margin-top: 20px;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="tree-menu" v-if="type === 'directory'">
     <div class="label-wrapper" @click="toggleChildren">
-      <div :style="indent" class="labelClasses">
+      <div :style="indent" :class="{labelClasses: true, active: isActive}">
         <img src="../assets/folder_icon.png" width="20" class="img--folder"/>
         {{ label }}
       </div>
@@ -15,7 +15,9 @@
         :nodes="node.contents" 
         :label="node.name"
         :depth="depth + 1"
-        :type="node.type"  
+        :type="node.type"
+        :path="path + node.name + '/'"
+        @childClick="childClick"  
       />
     </div>
   </div>
@@ -24,7 +26,9 @@
       :key="label" 
       :label="label"
       :depth="depth"
-      :type="type"  
+      :type="type"
+      :path="path"
+      @childClick="$emit('childClick', path)"
     />
   </div>
 </template>
@@ -34,13 +38,14 @@ import Element from './Element.vue';
 
 export default {
   name: 'Catalog',
-  props: [ 'nodes', 'label', 'depth', 'type' ],
+  props: [ 'nodes', 'label', 'depth', 'type', 'path' ],
   components: {
     Element
   },
   data() {
      return {
-       showChildren: false
+       showChildren: false,
+       isActive: false,
      }
   },
   computed: {
@@ -51,7 +56,14 @@ export default {
   methods: {
     toggleChildren() {
        this.showChildren = !this.showChildren;
-    }
+       this.isActive = !this.isActive;
+       this.$emit('childClick', this.$props.path);
+    },
+    childClick(param) {
+      // if need clear active class uncomment next line
+      // this.isActive = false;
+      this.$emit('childClick', param);
+    },
   }
 }
 </script>
@@ -59,13 +71,21 @@ export default {
 <style>
   .label-wrapper {
     padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #ccc;
   }
   .labelClasses {
+    min-height: 32px;
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: .3s;
+  }
+  .labelClasses.active {
+    background-color: mediumturquoise;
+  }
+  .labelClasses:hover {
+    background-color: #ccc;
   }
   .img--folder {
     margin-left: 8px;
