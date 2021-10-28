@@ -1,7 +1,7 @@
 <template>
   <div class="tree-menu" v-if="type === 'directory'">
     <div class="label-wrapper" @click="toggleChildren">
-      <div :style="indent" :class="{labelClasses: true, active: isActive}">
+      <div :style="indent" :class="{labelClasses: true, active: path === currentPath}">
         <img src="../assets/folder_icon.png" width="20" class="img--folder"/>
         {{ label }}
       </div>
@@ -17,7 +17,7 @@
         :depth="depth + 1"
         :type="node.type"
         :path="path + node.name + '/'"
-        @childClick="childClick"  
+        :currentPath="currentPath" 
       />
     </div>
   </div>
@@ -28,7 +28,7 @@
       :depth="depth"
       :type="type"
       :path="path"
-      @childClick="$emit('childClick', path)"
+      :currentPath="currentPath"
     />
   </div>
 </template>
@@ -38,14 +38,13 @@ import Element from './Element.vue';
 
 export default {
   name: 'Catalog',
-  props: [ 'nodes', 'label', 'depth', 'type', 'path' ],
+  props: [ 'nodes', 'label', 'depth', 'type', 'path', 'currentPath' ],
   components: {
     Element
   },
   data() {
      return {
        showChildren: false,
-       isActive: false,
      }
   },
   computed: {
@@ -55,14 +54,8 @@ export default {
   },
   methods: {
     toggleChildren() {
-       this.showChildren = !this.showChildren;
-       this.isActive = !this.isActive;
-       this.$emit('childClick', this.$props.path);
-    },
-    childClick(param) {
-      // if need clear active class uncomment next line
-      // this.isActive = false;
-      this.$emit('childClick', param);
+      this.showChildren = !this.showChildren;
+      this.$root.$emit('childClick', this.$props.path);
     },
   }
 }

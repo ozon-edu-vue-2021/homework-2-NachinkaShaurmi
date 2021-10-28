@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="path-wrapper">
-      <h2>{{currentPath}}</h2>
+      <h2>{{currentPath.slice(0, -1)}}</h2>
     </div>
     <div v-if="info" class="main">
       <Catalog 
@@ -10,7 +10,7 @@
         :path="'node_modules/'"   
         :label="info.data.name"
         :type="info.data.type"
-        @childClick="changePath"
+        :currentPath="currentPath"
       />
     </div>
   </div>
@@ -30,15 +30,14 @@ export default {
       isShow: false,
       info: null
     }),
-  methods: {
-    changePath(p) {
-       this.currentPath = p.slice(0, -1);
-    }
-  },
   mounted() {
     axios
       .get('./static/node_modules.json')
       .then(response => (this.info = response));
+
+    this.$root.$on('childClick', (p) => {
+       this.currentPath = p;
+    });
   }
 }
 </script>
