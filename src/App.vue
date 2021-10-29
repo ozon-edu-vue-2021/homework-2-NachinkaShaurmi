@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <div class="path-wrapper">
-      <h2>{{currentPath.slice(0, -1)}}</h2>
+      <h2>{{ currentPath.slice(0, -1) }}</h2>
     </div>
     <div v-if="info" class="main">
-      <Catalog 
+      <Catalog
         :nodes="info.data.contents"
         :depth="0"
-        :path="'node_modules/'"   
+        :path="'node_modules/'"
         :label="info.data.name"
         :type="info.data.type"
         :currentPath="currentPath"
@@ -18,28 +18,81 @@
 
 <script>
 import axios from "axios";
-import Catalog from './components/Catalog.vue';
+import Catalog from "./components/Catalog.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Catalog
+    Catalog,
   },
   data: () => ({
-      currentPath: "",
-      isShow: false,
-      info: null
-    }),
+    currentPath: "",
+    rootEl: null,
+    isShow: false,
+    info: null,
+    currentType: "",
+  }),
+  methods: {
+    keyDownHandler(e) {
+      if (this.rootEl) {
+        const next = this.rootEl.nextElementSibling;
+        const prev = this.rootEl.previousElementSibling;
+        const parent = this.rootEl?.parentElement?.parentElement;
+        const firstChild = this.rootEl?.children[1]?.firstElementChild;
+
+        switch (e.key) {
+          case "ArrowDown":
+            if (next) {
+              this.currentPath = next.getAttribute("path");
+              this.rootEl = next;
+            }
+            break;
+
+          case "ArrowUp":
+            if (prev) {
+              this.currentPath = prev.getAttribute("path");
+              this.rootEl = prev;
+            }
+            break;
+
+          case "ArrowLeft":
+            if (parent) {
+              if (this.currentPath === "node_modules/") return;
+              this.currentPath = parent.getAttribute("path");
+              this.rootEl = parent;
+            }
+            break;
+
+          case "ArrowRight":
+            if (firstChild) {
+              this.currentPath = firstChild.getAttribute("path");
+              this.rootEl = firstChild;
+            }
+            break;
+
+          default:
+            break;
+        }
+      }
+    },
+  },
   mounted() {
     axios
-      .get('./static/node_modules.json')
-      .then(response => (this.info = response));
+      .get("./static/node_modules.json")
+      .then((response) => (this.info = response));
 
-    this.$root.$on('childClick', (p) => {
-       this.currentPath = p;
+    this.$root.$on("childClick", (p, el, type) => {
+      this.rootEl = el;
+      this.currentType = type;
+      this.currentPath = p;
     });
-  }
-}
+
+    window.addEventListener("keyup", this.keyDownHandler);
+  },
+  destroyed() {
+    window.removeEventListener("keydown", this.keyDownHandler);
+  },
+};
 </script>
 
 <style>

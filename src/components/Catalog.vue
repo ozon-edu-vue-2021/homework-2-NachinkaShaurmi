@@ -1,5 +1,5 @@
 <template>
-  <div class="tree-menu" v-if="type === 'directory'">
+  <div class="tree-menu" v-if="type === 'directory'" :path="path">
     <div class="label-wrapper" @click="toggleChildren">
       <div :style="indent" :class="{labelClasses: true, active: path === currentPath}">
         <img src="../assets/folder_icon.png" width="20" class="img--folder"/>
@@ -21,8 +21,8 @@
       />
     </div>
   </div>
-  <div v-else>
-    <Element  
+    <Element
+      v-else  
       :key="label" 
       :label="label"
       :depth="depth"
@@ -30,7 +30,6 @@
       :path="path"
       :currentPath="currentPath"
     />
-  </div>
 </template>
 
 <script>
@@ -55,7 +54,7 @@ export default {
   methods: {
     toggleChildren() {
       this.showChildren = !this.showChildren;
-      this.$root.$emit('childClick', this.$props.path);
+      this.$root.$emit('childClick', this.$props.path, this.$el, this.$props.type);
     },
   }
 }

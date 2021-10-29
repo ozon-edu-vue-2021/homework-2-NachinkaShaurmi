@@ -1,5 +1,5 @@
 <template>
-  <div class="tree-menu">
+  <div class="tree-menu" :path="path">
     <div class="label-wrapper" @click="elementClick">
       <div :style="indent" :class="{labelClasses: true, active: path === currentPath}">
         <img src="../assets/link_icon.png" v-show="type === 'link'" width="20"/>
@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     elementClick() {
-      this.$root.$emit('childClick', this.$props.path);
+      this.$root.$emit('childClick', this.$props.path, this.$el, this.$props.type);
     }
   }
 }
